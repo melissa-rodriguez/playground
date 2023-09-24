@@ -1,2 +1,2 @@
 # preview
-<!-- ![NAME](link to image) -->
+![01](outputs/01.png)

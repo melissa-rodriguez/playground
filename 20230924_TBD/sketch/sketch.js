@@ -1,46 +1,68 @@
-let shape; 
+let shape;
 
-function setup(){
-  createCanvas(1000, 1000); 
+function setup() {
+  createCanvas(1000, 1000);
 
-  shape = new CornerSquare(); 
+  shape = new CornerSquare();
 }
 
-function draw(){
-  background(240); 
+function draw() {
+  background(240);
 
   shape.show();
 }
 
-class CornerSquare{
-  constructor(){
-    this.pos = createVector(width/2, height/2); 
-    this.w = 200; 
-    this.h = 200; 
+class CornerSquare {
+  constructor() {
+    this.pos = createVector(width / 2, height / 2);
+    this.w = 200;
+    this.h = 200;
 
-    this.uLeft_pos = createVector(this.pos.x - this.w/2, this.pos.y - this.h/2); //upper left pos
-    this.uRight_pos = createVector(this.pos.x + this.w/2, this.pos.y - this.h/2); //upper right pos
-    this.lLeft_pos = createVector(this.pos.x - this.w/2, this.pos.y + this.h/2); //lower left pos
-    this.lRight_pos = createVector(this.pos.x + this.w/2, this.pos.y + this.h/2); //lower right pos
+    //clockwise
+    this.p1 = new squarePoint(this.pos.x - this.w / 2, this.pos.y - this.h / 2); //upper left pos
+    this.p2 = new squarePoint(this.pos.x + this.w / 2, this.pos.y - this.h / 2); //upper right pos
+    this.p3 = new squarePoint(this.pos.x + this.w / 2, this.pos.y + this.h / 2); //lower right pos
+    this.p4 = new squarePoint(this.pos.x - this.w / 2, this.pos.y + this.h / 2); //lower left pos
+    
 
-    this.uLeft_fill = false;
-    this.uRight_fill = false; 
-    this.lLeft_fill = false; 
-    this.lRight_fill = false; 
+    this.corners = [this.p1, this.p2, this.p3, this.p4];
 
-    let corner = ["uLeft", "uRight", "lLeft", "lRight"]; 
+    let ellipseType = ["horizontal", "vertical"];
+    
+    for(let i = 0; i<this.corners.length; i++){
+      this.corners[i].filled = round(random(1)); 
+    }
 
-    //pick a start point (random)
-    //if point lies on diagonal, don't look for more points
-    //else look at the other untouched points
+    // -- make sure there's always at least two points filled? --
+    // let fillCount = 0; 
+    // for(let j = 0; j<this.corners.length; j++){
+    //   let pt = this.corners[i];
+    //   if(pt.filled){
+    //     fillCount++;
+    //   }
+    // }
   }
 
-  show(){
-    strokeWeight(10); 
-    stroke('red'); 
-    point(this.uLeft_pos.x, this.uLeft_pos.y);
-    point(this.uRight_pos.x, this.uRight_pos.y);
-    point(this.lLeft_pos.x, this.lLeft_pos.y);
-    point(this.lRight_pos.x, this.lRight_pos.y);
+  pickFromList(list) {
+    //pick an item from a list
+    return list[int(random(list.length))];
+  }
+
+  show() {
+    strokeWeight(10);
+    stroke('red');
+    for(let i = 0; i<this.corners.length; i++){
+      let pt = this.corners[i]; 
+      if(pt.filled){
+        point(pt.pos.x, pt.pos.y); 
+      }
+    }
+  }
+}
+
+class squarePoint{
+  constructor(x, y){
+    this.pos = createVector(x,y); 
+    this.filled = false; 
   }
 }

@@ -26,12 +26,12 @@ class LerpLine {
     stroke(0);
     // line(this.x1, this.y1, this.x2, this.y2);
     noFill();
-    strokeWeight(0.5);
+    strokeWeight(4);
     ellipse(this.x1, this.y1, 20); 
     ellipse(this.x2, this.y2, 20); 
 
 
-    strokeWeight(4);
+    strokeWeight(10);
 
     for (let i = 0; i <= this.amtPoints; i++) {
       let x = lerp(this.x1, this.x2, i / this.amtPoints);

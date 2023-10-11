@@ -1,6 +1,7 @@
 # playground
 A place for studies and rough ideas.  
 # previews  
+[<img src='20231011_HangingWires//outputs/01.png' height = '200' width = '200'>](20231011_HangingWires/) 
 [<img src='20231009_500kPoints//outputs/01.png' height = '200' width = '200'>](20231009_500kPoints/) 
 [<img src='20231007_LerpArc//outputs/01.png' height = '200' width = '200'>](20231007_LerpArc/) 
 [<img src='20231006_LerpLine//outputs/01.png' height = '200' width = '200'>](20231006_LerpLine/) 

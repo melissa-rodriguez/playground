@@ -1,10 +1,10 @@
 # playground
 A place for studies and rough ideas.  
 # previews  
-[<img src='20231011_HangingWires//outputs/01.png' height = '200' width = '200'>](20231011_HangingWires/) 
-[<img src='20231009_500kPoints//outputs/01.png' height = '200' width = '200'>](20231009_500kPoints/) 
-[<img src='20231007_LerpArc//outputs/01.png' height = '200' width = '200'>](20231007_LerpArc/) 
-[<img src='20231006_LerpLine//outputs/01.png' height = '200' width = '200'>](20231006_LerpLine/) 
-[<img src='20230930_LineOfLines//outputs/01.png' height = '200' width = '200'>](20230930_LineOfLines/) 
-[<img src='20230924_LinesInHoles//outputs/01.png' height = '200' width = '200'>](20230924_LinesInHoles/) 
+[<img src='2306//outputs/01.png' height = '200' width = '200'>](2306/) 
+[<img src='2305//outputs/01.png' height = '200' width = '200'>](2305/) 
+[<img src='2304//outputs/01.png' height = '200' width = '200'>](2304/) 
+[<img src='2303//outputs/01.png' height = '200' width = '200'>](2303/) 
+[<img src='2302//outputs/01.png' height = '200' width = '200'>](2302/) 
+[<img src='2301//outputs/01.png' height = '200' width = '200'>](2301/) 
 

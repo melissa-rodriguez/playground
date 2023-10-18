@@ -3,11 +3,6 @@ A place for studies and rough ideas.
 # previews  
 
 
-## 2024
-
-<a href='2402/'><img src='2402//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2401/'><img src='2401//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   
 ## 2023
 
 <a href='2306/'><img src='2306//outputs/01.png' height='200' width='200' style='margin: 

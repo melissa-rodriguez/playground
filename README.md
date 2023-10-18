@@ -1,7 +1,7 @@
 # playground
 A place for studies and rough ideas.  
 # previews  
-## 2023
+
 
 ## 2024
 

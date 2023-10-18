@@ -17,7 +17,3 @@ A place for studies and rough ideas.
 5px;'></a>   <a href='2302/'><img src='2302//outputs/01.png' height='200' width='200' style='margin: 
 5px;'></a>   <a href='2301/'><img src='2301//outputs/01.png' height='200' width='200' style='margin: 
 5px;'></a>   
-## 20em
-
-<a href='empty-example/'><img src='empty-example//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   

@@ -1,5 +1,5 @@
 # archive
-A place for studies and rough ideas.  
+Practice makes better.  
 # previews  
 
 

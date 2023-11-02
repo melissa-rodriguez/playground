@@ -1,162 +1,104 @@
-import peasy.*;
-PeasyCam cam;
-
-
-PGraphics pg; 
-PFont font;
-
-
-// Total number of frames in the gif
-int numFrames = 144;
-
-float scale = 20;
-float r1 = 20; //big ring
-float r2 = 10; //big ring 
-
-
-float r3 = 20; //small ring
-float r4 = 3;  //small ring
-
-PVector surface(float theta, float phi, float r1, float r2) {
-  //float x = scale*(r1+r2*cos(theta+t/4))*cos(phi+t);
-  //float y = scale*(r1+r2*cos(theta+t/4))*sin(phi+t);
-  //float z = scale*r2*sin(theta+t/4);
-
-  float x = scale*(r1+r2*(cos(theta+t)))*(cos(phi+t));
-  float y = scale*(r1+r2*(cos(theta+t)))*(sin(phi+t));
-  float z = scale*r2*(sin(theta+t));
-
-  return new PVector(x, y, z);
-}
-
-void draw_surface(float r1, float r2, int n1, int n2, String dir) {
-  String direction = dir;
-
-  if (direction == "D2") { //outer
-    textGraphics("OUTER", 0); //word and zoom out amt
-  } else if (direction == "D1") { //inner
-    textGraphics("INNER", 0); // word and zoom out amt
-  }
-  stroke(255); // white lines
-  fill(0); // black fill
-  strokeWeight(3);
-
-  noStroke();
-  textureMode(NORMAL);
-  textureWrap(REPEAT);
-
-
-  for (int i = 0; i < n1; i++) {
-    //Stripes
-    //if ((i)%2 == 0) {
-    //  fill(0);
-    //} else {
-    //  fill(200);
-    //}
-
-    beginShape(TRIANGLE_STRIP);
-    texture(pg);
-    for (int j = 0; j < n2+1; j++) {
-      float theta1 = map(i, 0, n1, 0, 2*PI);
-      float theta2 = map(i+1, 0, n1, 0, 2*PI);
-
-      float phi = map(j, 0, n2, 0, 2*PI);
-
-      PVector v1 = surface(theta1, phi, r1, r2);
-      PVector v2 = surface(theta2, phi, r1, r2);
-
-      float u = map(i, 0, i+1, 0, 1);
-      float v = map(j, 0, j+1, 0, 1);
-      float v_2 = map(j+1, 0, j+1, 0, 1);
-
-      vertex(v1.x, v1.y, v1.z, i, j);
-
-      if (direction == "D1") {
-        vertex(v2.x, v2.y, v2.z, i-1, j);
-      } else if (direction == "D2") {
-        vertex(v2.x, v2.y, v2.z, i+1, j);
-      }
-
-      //vertex(v1.x, v1.y, v1.z, j, i-1);
-      //vertex(v2.x, v2.y, v2.z, j, i);
-
-      //vertex(v1.x, v1.y, v1.z);
-      //vertex(v2.x, v2.y, v2.z);
-    }
-    endShape();
-  }
-}
-
-
+ArrayList<Shape> shapes;
+OpenSimplexNoise noise;
 void setup() {
   size(1080, 1080, P3D);
   pixelDensity(2);
   smooth(8);
 
-  pg = createGraphics(1080, 1920, P3D); 
+  noise = new OpenSimplexNoise();
 
-  font = createFont("bebas.ttf", 300);
-  pg.imageMode(CENTER);
+  rectMode(CENTER);
+  colorMode(HSB);
 
-  textureMode(NORMAL);
+  shapes = new ArrayList<Shape>();
+  
+  int amt = 10; 
+  for(int i = 0; i <= amt; i++){
+   float x = map(i, 0, amt, -width/2, width/2);
+   float y = 0; 
+   PVector pos = new PVector(x,y); 
+   int direction = round(random(0,1)); 
+   float noiseFactor = constrain(0.3*randomGaussian(), 0.001, 0.01); 
+   shapes.add(new Shape(direction, pos, noiseFactor));
+  }
+  
 
-  cam = new PeasyCam(this, 550);
 }
 
-float t; 
+
 void draw() {
-  background(0);
-  //t = 1.0*(frameCount-1)/numFrames;
-  t+=radians(0.5);
-
-  //push();
-
-
-  push();
-  rotateX(radians(75));
-  translate(-200, 0);
-  
-  //rotateX(radians(75));
-  //translate(-200, 0);
-  //rotate(radians(mouseX));
-
+  background(240); 
+  translate(width/2, height/2-65, - 700);
+  rotate(PI/2);
   println(mouseX);
 
-  pushMatrix();
-  //rotateY(2*PI*t);
-  int res = 40;
-  draw_surface(r1, r2, res, res-5, "D2" ); //outer 
-  draw_surface(r3, r4, res-30, res, "D1"); //inner 
-  popMatrix();
+  for (Shape s : shapes) {
+    s.show();
+  }
 
-  pop();
-
-  //footer();
-
-  //Saves the frame
-  //println(frameCount,"/",numFrames);
-  //saveFrame("output2/gif###.png");
-
-  //// Stops when all the frames are rendered
-  //if(frameCount == numFrames){
-  //    exit();
-  //}
+  strokeWeight(1.5);
+ 
 }
 
-void textGraphics(String str, int zoom) {
-  String word = str;
-  pg.beginDraw();
-  pg.background(0);
+class Shape {
+  int ires;
+  int r; 
+  float startAngle1, startAngle2, stopAngle; //start and stop angle of the arc
+  float start, stop; 
+  float sw; //strokeweight
+  PVector shapePos; 
 
-  pg.push();
-  pg.translate(pg.width/2, pg.height/2, pg.width-zoom);
-  pg.rotate(-PI/2);
-  pg.fill(255);
-  pg.textSize(200);
-  pg.textFont(font);
-  pg.textAlign(CENTER, CENTER);
-  pg.text(word, 0, 0); 
+  int direction; 
+  
+  float scale; //noise variation amount
 
-  pg.pop();
-  pg.endDraw();
+  Shape(int d, PVector p, float s) {
+    ires = 888;
+    r = 200;
+    startAngle1 = -PI;
+    startAngle2 = -PI/2;
+    
+    shapePos = p; 
+
+    direction = d; 
+    
+    scale = s; 
+
+    //startAngle1 = constrain((-PI)*randomGaussian(), -TAU, TAU);
+    //startAngle2 = constrain((-PI/2)*randomGaussian(),-TAU, TAU);
+  }
+
+  void show() {
+    noFill();
+    push();
+    translate(shapePos.x, shapePos.y);
+
+    for (int i = 0; i < ires; i++) {
+      float a = map(i, 0, ires, 0, TAU); 
+      float x = 300*cos(a);
+      float y = 300*sin(a); 
+      
+      float n = (float)noise.eval(x*scale, y*scale); 
+      stopAngle = map(n, -1, 1, 0, PI/4);
+      float noiseRadius = map(n, -1, 1, 0, 1);
+      //float start = -PI;
+      //float stop = -PI/2;
+
+      start = map(i, 0, ires, startAngle1, startAngle1 + stopAngle + TAU);
+      stop = map(i, 0, ires, startAngle2, startAngle2  + stopAngle + TAU);
+      if (direction == 0) {
+        r = int(map(i, 0, ires, 5*noiseRadius, 400*noiseRadius));
+      } else if (direction == 1) {
+        r = int(map(i, 0, ires, 400*noiseRadius, 5*noiseRadius));
+      }
+      stroke(map(i, 0, ires, 0, 100),100); 
+      arc(x+r/2, y, r, r/2, start, stop);
+      //circle(x, y, 20);
+    }
+    pop();
+  }
+}
+
+void mousePressed(){
+ saveFrame("render.png"); 
 }

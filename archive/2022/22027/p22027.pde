@@ -32,8 +32,9 @@ void setup() {
 
       PVector center = new PVector(x, y); 
 
-
-      hexagons.add(new Hexagon(center, size));
+      if (mag(center.x, center.y) < 400) {
+        hexagons.add(new Hexagon(center, size));
+      }
     }
   }
 }
@@ -86,7 +87,7 @@ class Triangle {
     rotate(radians(30)); //rotate the triangle so the point/peak faces down
     rotate(a); //rotate each triangle about the center point of the hexagon
     translate(0, size); 
-    //rotate(radians(37)); 
+    rotate(radians(37)); 
     beginShape();
     vertex(v1.x, v1.y); 
     vertex(v2.x, v2.y); 

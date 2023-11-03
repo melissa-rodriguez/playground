@@ -5,11 +5,4 @@ A place for studies and rough ideas.
 
 ## 2023
 
-<a href='2307/'><img src='2307//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2306/'><img src='2306//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2305/'><img src='2305//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2304/'><img src='2304//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2303/'><img src='2303//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2302/'><img src='2302//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   <a href='2301/'><img src='2301//outputs/01.png' height='200' width='200' style='margin: 
-5px;'></a>   
+<a href='2023/23001/'>![01](outputs/01.png)</a><br><a href='2023/23002/'>![01](outputs/01.png)</a><br><a href='2023/23003/'>![01](outputs/01.png)</a><br><a href='2023/23004/'>![01](outputs/01.png)</a><br><a href='2023/23005/'>![01](outputs/01.png)</a><br><a href='2023/23006/'>![01](outputs/01.png)</a><br><a href='2023/23007/'>![01](outputs/01.png)</a><br><a href='2023/23008/'>![01](outputs/01.png)</a><br><a href='2023/23009/'>![01](outputs/01.png)</a><br><a href='2023/23010/'>![01](outputs/01.png)</a><br><a href='2023/23011/'>![01](outputs/01.png)</a><br><a href='2023/23012/'>![01](outputs/01.png)</a><br>

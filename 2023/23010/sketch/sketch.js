@@ -1,91 +1,71 @@
+let customArcs = [];
+
 function setup() {
   createCanvas(1000, 1000);
-  background(240);
 
+  let x = width / 2;
+  let y = height / 2;
+  let w = 400;
+  let h = 600;
+  let startAngle = 0;
+  let endAngle = PI;
+  let numPoints = 50;
+
+  for (let i = 0; i < 20; i++) {
+    customArcs.push(new LerpArc(x, y, w, h, startAngle, endAngle, numPoints));
+  }
 }
 
 function draw() {
-  background(230);
-  fill(0);
-  generateShape();
-  noLoop();
-}
+  background(240);
 
-let count = 0; 
-function mousePressed() {
-  count++;
-  clear();
-  background(230);
-  noiseSeed(int(random(1000)));
-  randomSeed(int(random(1000)))
-
-  generateShape();
-  save("gosted" + str(count) + ".png"); 
-}
-
-function generateShape() {
-  let noiseMax = 0.8;
-
-  for (let i = 0; i < 500; i++) {
-
-    let theta = map(i, 0, 500, 0, TAU);
-
-    let xoff = map(1 + cos(theta), 0, 1, 0, noiseMax);
-    let yoff = map(1 + sin(theta), 0, 1, 0, noiseMax);
-    let n = noise(xoff, yoff);
-
-    // if (n > 0.4) {
-    //   stroke(0)
-    // } else {
-    //   // stroke(220);
-    //   stroke(255);
-    // }
-
-
-    let r = map(n, 0, 1, 100, 300);
-    let x = width / 2 + r * cos(theta);
-    let y = height / 2 + r * sin(theta);
-    // ellipse(x, y, 20, 20);
-
-    if (r > 200) {
-      stroke(255);
-    } else {
-      stroke(0);
-    }
-
-    let v = new brushVertex(x, y);
-
-
-    v.show();
+  for (let i = 0; i < 20; i++) {
+  customArcs[i].show();
   }
 }
 
+class LerpArc {
+  constructor(x_, y_, w_, h_, startAngle_, endAngle_, numPoints_) {
+    this.x = x_;
+    this.y = y_;
+    this.w = w_ / 2;
+    this.h = h_ / 2 + random(-h_/5, h_/5);
+    this.startAngle = startAngle_;
+    this.endAngle = endAngle_;
+    this.numPoints = numPoints_;
+    this.phaseOffset = random(-PI / 6, PI / 6);
+    // this.sw = int(random(8, 10));
+    this.sw = 10;
 
-
-class brushVertex {
-  constructor(xpos, ypos) {
-    this.x = xpos;
-    this.y = ypos;
   }
 
   show() {
-    let amt = 1000;
+    stroke(0);
+    // line(this.x1, this.y1, this.x2, this.y2);
+    noFill();
+    strokeWeight(4);
+    ellipse(this.x + this.w, this.y, 20, 20);
+    ellipse(this.x - this.w, this.y, 20, 20);
 
-    for (let i = 0; i < amt; i++) {
-      let theta = random(map(i, 0, amt, 0, TAU));
 
-      let xoff = 1 + cos(theta);
-      let yoff = 1 + sin(theta);
-      let n = noise(xoff, yoff);
+    strokeWeight(this.sw);
+    beginShape();
+    for (let i = 0; i <= this.numPoints; i++) {
+      // let x = lerp(this.x1, this.x2, i / this.numPoints);
+      // let y = lerp(this.y1, this.y2, i / this.numPoints);
 
-      let maxR = 100;
-      let r = (random(random(random(maxR)))) + map(n, 0, 1, -100, 200);
-      // let r = (random(random(random(maxR))));
-      let x = this.x + r * cos(theta);
-      let y = this.y + r * sin(theta);
+      let theta = map(i, 0, this.numPoints, this.startAngle, this.endAngle);
+      let xpos = map(i, 0, this.numPoints, this.x - this.w, this.x + this.w);
+      let ypos = this.y + this.h * sin(theta);
+      let phase = map(ypos, this.y, this.y + this.h, 0, this.phaseOffset);
+      theta += phase;
+      ypos = this.y + this.h * sin(theta);
+      
 
-      point(x, y);
+      curveVertex(xpos, ypos);
     }
-  }
+    endShape(OPEN);
 
+
+  }
 }

@@ -1,255 +1,242 @@
-let palette = ['#134184', '#222222', '#BFA21B', '#99281B'];
-let grid;
-
+let shapes = [];
+// let shape;
 function setup() {
-  createCanvas(2000, 2000);
+  createCanvas(1000, 1000);
+  // randomSeed(1); //horiz
+  // randomSeed(3); //back diag
+  // randomSeed(6); //vertical
+  // randomSeed(39); //forward diag
+  // shape = new CornerSquare(width/2, height/2, 100, 100);
 
-  grid = new circleGrid(width / 2, height / 2, 200, 10, 4);
+  let cols = 4;
+  let rows = 4;
+  let spacing = 150;
+
+  let boxW = (width - cols * spacing) / cols;
+  let boxH = (height - rows * spacing) / rows;
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let xpos = (boxW + spacing) / 2 + (boxW + spacing) * i;
+      let ypos = (boxH + spacing) / 2 + (boxH + spacing) * j;
+      // rect(xpos, ypos, boxW, boxH);
+      let shape = new CornerSquare(xpos, ypos, boxW, boxH);
+      shapes.push(shape);
+    }
+  }
+
+
+
 }
 
 function draw() {
   background(240);
-
-  grid.show();
-  // grid.customShapes[int(random(grid.customShapes.length))].show();
-
-  for (let i = 0; i < grid.customShapes.length; i++) {
-    let rand = sqrt(random(1));
-    let scribble, solidFill; 
-
-    if (rand >= 0.5) {
-      scribble = true; 
-      solidFill = false; 
-      grid.customShapes[i].show(solidFill, scribble);
-    }else{
-      scribble = false; 
-      solidFill = true; 
-      grid.customShapes[i].show(solidFill, scribble)
-    }
+  for (let i = 0; i < shapes.length; i++) {
+    let shape = shapes[i];
+    shape.show();
   }
-  // console.log(grid.customShapes); 
+
+  // shape.show();
+
+
 
   noLoop();
 }
 
-class circleGrid {
-  constructor(x_, y_, innerR, numCircles_, segLength) {
-    this.center = createVector(x_, y_);
-    this.innerRadius = innerR;
-    this.numCircles = numCircles_;
-    this.segmentLength = segLength;
-    this.spacingBetween = 100;
+class CornerSquare {
+  constructor(x, y, w_, h_) {
+    // this.pos = createVector(width / 2, height / 2);
+    this.pos = createVector(x, y);
+    this.w = w_;
+    this.h = h_;
+    this.r = this.w / 3.5; //ellipse size
 
-    this.circles = [];
-    this.init();
+    let ellipseTypes = ["horizontal", "vertical"];
+    this.ellipseType = ellipseTypes[round(random(1))];
 
-    this.customShapes = [];
+    //clockwise
+    this.p1 = new squarePoint(this.pos.x - this.w / 2, this.pos.y - this.h / 2); //upper left pos
+    this.p2 = new squarePoint(this.pos.x + this.w / 2, this.pos.y - this.h / 2); //upper right pos
+    this.p3 = new squarePoint(this.pos.x + this.w / 2, this.pos.y + this.h / 2); //lower right pos
+    this.p4 = new squarePoint(this.pos.x - this.w / 2, this.pos.y + this.h / 2); //lower left pos
 
+
+    this.corners = [this.p1, this.p2, this.p3, this.p4];
+
+    this.connectionType = "";
+
+    //only pick two points
+    let keepChecking = true;
+    let point1 = this.corners[int(random(this.corners.length))];
+    point1.filled = true;
+
+    while (keepChecking) {
+      let point2 = this.corners[int(random(this.corners.length))];
+      if (point2.pos != point1.pos) {
+        point2.filled = true;
+
+        //valid point found!
+        keepChecking = false;
+      }
+    }
+
+    /* types of connections: diagonal, vertical, horizontal */
+    if ((this.p1.filled && this.p3.filled)) {
+      this.connectionType = "diagonal_backward";
+    } else if (this.p2.filled && this.p4.filled) {
+      this.connectionType = "diagonal_forward"
+    } else if ((this.p1.filled && this.p4.filled) || this.p2.filled && this.p3.filled) {
+      this.connectionType = "vertical";
+    } else {
+      this.connectionType = "horizontal";
+    }
   }
 
-  init() {
-    for (let i = 0; i <= this.numCircles; i++) {
-      // this.spacingBetween = int(200 * sqrt(random(1)));
-      let c = new Circle(width / 2, height / 2, this.innerRadius + this.spacingBetween * i);
-      this.circles.push(c);
-      // c.show();
-
-    }
+  pickFromList(list) {
+    //pick an item from a list
+    return list[int(random(list.length))];
   }
 
   show() {
-    for (let j = 0; j < this.circles.length - 1; j++) {
-      let currentCircle = this.circles[j];
-      let nextCircle = this.circles[j + 1];
-      // let segmentLength = int(random(1, this.segmentLength));
-      let segmentLength = this.segmentLength;
-      // noFill(); 
-      for (let k = 0; k < currentCircle.circleVertices.length - segmentLength; k += segmentLength) {
-        let currentAngle = currentCircle.circleVertices[k].angle;
-        let nextAngle = nextCircle.circleVertices[k].angle;
-
-        let shapeVertices = [];
-
-        if (currentAngle == nextAngle) {
-          let x1 = currentCircle.circleVertices[k].x;
-          let y1 = currentCircle.circleVertices[k].y;
-          let x2 = nextCircle.circleVertices[k].x;
-          let y2 = nextCircle.circleVertices[k].y;
-
-          let x3 = nextCircle.circleVertices[k + segmentLength].x;
-          let y3 = nextCircle.circleVertices[k + segmentLength].y;
-          let x4 = currentCircle.circleVertices[k + segmentLength].x;
-          let y4 = currentCircle.circleVertices[k + segmentLength].y;
+    strokeWeight(20);
+    strokeCap(SQUARE);
+    // stroke('red');
+    // noFill();
 
 
-          beginShape();
-          noFill();
-          noFill();
-          // // fill(palette[int(random(palette.length))]);
-          stroke(240);
-          
-          // // stroke(palette[int(random(palette.length))]);
-          // strokeWeight(5);
-
-          vertex(x1, y1);
-          vertex(x2, y2);
-
-          // shapeVertices.push(createVector(x1, y1));
-          // shapeVertices.push(createVector(x2, y2));
-
-          shapeVertices.push(currentCircle.circleVertices[k]);
-          shapeVertices.push(nextCircle.circleVertices[k]);
-
-
-
-          for (let between = 1; between < segmentLength - 1; between++) {
-            let betx1 = nextCircle.circleVertices[k + between].x;
-            let bety1 = nextCircle.circleVertices[k + between].y;
-
-            let betx2 = nextCircle.circleVertices[k + between + 1].x;
-            let bety2 = nextCircle.circleVertices[k + between + 1].y;
-            // ellipse(betx2, bety2, 15); 
-
-            vertex(betx1, bety1);
-            vertex(betx2, bety2);
-
-            // shapeVertices.push(createVector(betx1, bety1));
-            // shapeVertices.push(createVector(betx2, bety2));
-
-            shapeVertices.push(nextCircle.circleVertices[k + between]);
-            shapeVertices.push(nextCircle.circleVertices[k + between + 1]);
-
-          }
-
-          vertex(x3, y3);
-          vertex(x4, y4);
-
-          // shapeVertices.push(createVector(x3, y3));
-          // shapeVertices.push(createVector(x4, y4));
-
-          shapeVertices.push(nextCircle.circleVertices[k + segmentLength]);
-          shapeVertices.push(currentCircle.circleVertices[k + segmentLength]);
-
-
-          for (let between = segmentLength - 1; between > 0; between--) {
-            let betx1 = currentCircle.circleVertices[k + between].x;
-            let bety1 = currentCircle.circleVertices[k + between].y;
-
-            let betx2 = currentCircle.circleVertices[k + between - 1].x;
-            let bety2 = currentCircle.circleVertices[k + between - 1].y;
-            // ellipse(betx2, bety2, 15); 
-
-            vertex(betx1, bety1);
-            vertex(betx2, bety2);
-
-            // shapeVertices.push(createVector(betx1, bety1));
-            // shapeVertices.push(createVector(betx2, bety2));
-
-            shapeVertices.push(currentCircle.circleVertices[k + between]);
-            shapeVertices.push(currentCircle.circleVertices[k + between - 1]);
-
-
-          }
-          endShape(CLOSE);
-
-          this.customShapes.push(new customShape(shapeVertices));
-        }
-
+    if (this.ellipseType == "horizontal") {
+      let holeWidth = this.r * 2.5;
+      let holeHeight = this.r;
+      this.horizontalRender(holeWidth, holeHeight);
+    } else if (this.ellipseType == "vertical") {
+      let holeWidth = this.r;
+      let holeHeight = this.r * 2.5;
+      if (this.connectionType != "diagonal_forward" && this.connectionType != "diagonal_backward") {
+        this.verticalRender(holeWidth, holeHeight);
       }
-
     }
-  }
-}
 
-class customShape {
-  constructor(shapeVertices) {
-    this.vertices = shapeVertices; // array of 4 vertices to connect
+
   }
 
-  show(solidFill, scribble) {
-
-    if (solidFill) {
-      beginShape();
-      fill(0);
-      stroke(240);
-      for (let i = 0; i < this.vertices.length; i++) {
-        let v = this.vertices[i];
-
-        vertex(v.x, v.y);
+  verticalRender(holeWidth, holeHeight) {
+    //----ELLIPSE----
+    noStroke();
+    fill(0);
+    for (let i = 0; i < this.corners.length; i++) {
+      let pt = this.corners[i];
+      if (pt.filled) {
+        ellipse(pt.pos.x, pt.pos.y, holeWidth, holeHeight);
       }
-      endShape(CLOSE);
     }
 
-    let v1 = this.vertices[0];
-    let v2 = this.vertices[1];
-    let v3 = this.vertices[2];
-    let v4 = this.vertices[int((this.vertices.length - 1) / 2)];
-
-    if (scribble) {
-      beginShape();
-      noFill();
-      for (let j = 0; j < this.vertices.length * 2; j++) {
-        let randV1 = this.vertices[int((this.vertices.length) * sqrt(random(1)))];
-        let randV2 = this.vertices[int((this.vertices.length) * sqrt(random(1)))];
-        stroke(0);
-        strokeWeight(map(j, 0, this.vertices.length, 0.05, 0.3));
-        // line(randV1.x, randV1.y, randV2.x, randV2.y);
-        curveVertex(randV1.x, randV1.y);
-        curveVertex(randV2.x, randV2.y);
-      }
-      endShape();
-    }
-  }
-}
-
-class Circle {
-  constructor(centerX, centerY, size) {
-    this.center = createVector(centerX, centerY);
-    this.r = size / 2;
-
-    // this.numPoints = int(this.r / 2);
-    this.numPoints = 50; //resolution (how many divisons there are)
-
-    this.circleVertices = [];
-    this.saveVertices();
-  }
-
-  saveVertices() {
-    for (let a = 0; a < TAU; a += TAU / this.numPoints) {
-      let x = this.center.x + this.r * cos(a);
-      let y = this.center.y + this.r * sin(a);
-
-      let v = new Vertex(x, y, a);
-
-      this.circleVertices.push(v);
-    }
-  }
-
-  show(col) {
-    // for (let a = 0; a < TAU; a += TAU / this.numPoints) {
-    //   let x = this.center.x + this.r * cos(a);
-    //   let y = this.center.y + this.r * sin(a);
-
-    //   ellipse(x, y, 5);
-    // }
-    beginShape();
+    //-----CONNECTING LINES-----
+    stroke('red');
     noFill();
-    for (let i = 0; i < this.circleVertices.length; i++) {
-      let pt = this.circleVertices[i];
-      // fill(map(i, 0, this.circleVertices.length, 0, 200));
-      // fill(col);
-      // ellipse(pt.x, pt.y, 5);
-      curveVertex(pt.x, pt.y);
+    let arcDiameter = this.w;
+    let chooseRandom = random(1);
 
+    if (this.connectionType == "vertical") {
+      if (this.p1.filled || this.p4.filled) {
+        if (chooseRandom > 0.5) {
+          //right
+          arc(this.p1.pos.x - holeWidth/2, (this.p1.pos.y + this.p4.pos.y) / 2, arcDiameter, arcDiameter, PI + PI / 2, TAU + PI / 2);
+        } else {
+          //left
+          arc(this.p1.pos.x + holeWidth/2, (this.p1.pos.y + this.p4.pos.y) / 2, arcDiameter, arcDiameter, PI / 2, PI + PI / 2);
+        }
+      } else {
+        if (chooseRandom > 0.5) {
+          //right
+          arc(this.p2.pos.x - holeWidth/2, (this.p2.pos.y + this.p3.pos.y) / 2, arcDiameter, arcDiameter, PI + PI / 2, TAU + PI / 2);
+        } else {
+          //left
+          arc(this.p2.pos.x + holeWidth/2, (this.p2.pos.y + this.p3.pos.y) / 2, arcDiameter, arcDiameter, PI / 2, PI + PI / 2);
+        }
+      }
+    } else if (this.connectionType == "horizontal") {
+      if (this.p1.filled || this.p2.filled) {
+        line(this.p1.pos.x - holeWidth/2, this.p1.pos.y, this.p2.pos.x + holeWidth/2, this.p2.pos.y);
+      } else {
+        line(this.p4.pos.x - holeWidth/2, this.p4.pos.y, this.p3.pos.x + holeWidth/2, this.p3.pos.y);
+      }
     }
-    endShape(CLOSE);
+  }
+
+  horizontalRender(holeWidth, holeHeight) {
+    //----ELLIPSE----
+    noStroke();
+    fill(0);
+    for (let i = 0; i < this.corners.length; i++) {
+      let pt = this.corners[i];
+      if (pt.filled) {
+        ellipse(pt.pos.x, pt.pos.y, holeWidth, holeHeight);
+      }
+    }
+
+    //----CONNECTING LINES-----
+    stroke('red');
+    noFill();
+    let chooseRandom = random(1);
+    let arcDiameter = this.w;
+
+
+    if (this.connectionType == "diagonal_backward") {
+
+      if (chooseRandom > 0.5) {
+        //go over
+        line(this.p3.pos.x, this.p3.pos.y + holeHeight/2, this.p3.pos.x, this.p1.pos.y + holeHeight/2);
+        arc(this.p3.pos.x - arcDiameter / 2, this.p1.pos.y + holeHeight/2, arcDiameter, arcDiameter, PI, 0);
+      } else {
+        //go under
+        line(this.p1.pos.x, this.p1.pos.y - holeHeight/2, this.p1.pos.x, this.p3.pos.y - holeHeight/2);
+        arc(this.p1.pos.x + arcDiameter / 2, this.p3.pos.y - holeHeight/2, arcDiameter, arcDiameter, 0, PI);
+
+      }
+      //determine ellipsetype
+    } else if (this.connectionType == "diagonal_forward") {
+
+      if (chooseRandom > 0.5) {
+        //go over
+        line(this.p4.pos.x, this.p4.pos.y + holeHeight/2, this.p4.pos.x, this.p2.pos.y + holeHeight/2);
+        arc(this.p4.pos.x + arcDiameter / 2, this.p2.pos.y + holeHeight/2, arcDiameter, arcDiameter, PI, TAU);
+      } else {
+        //go under
+        line(this.p2.pos.x, this.p2.pos.y - holeHeight/2, this.p2.pos.x, this.p4.pos.y - holeHeight/2);
+        arc(this.p2.pos.x - arcDiameter / 2, this.p4.pos.y - holeHeight/2, arcDiameter, arcDiameter, 0, PI);
+
+      }
+    } else if (this.connectionType == "vertical") {
+      if (this.p1.filled || this.p4.filled) {
+        line(this.p1.pos.x, this.p1.pos.y - holeHeight/2, this.p4.pos.x, this.p4.pos.y + holeHeight/2);
+      } else {
+        line(this.p2.pos.x, this.p2.pos.y - holeHeight/2, this.p3.pos.x, this.p3.pos.y + holeHeight/2);
+      }
+    } else if (this.connectionType == "horizontal") {
+      if (this.p1.filled || this.p2.filled) {
+        if (chooseRandom > 0.5) {
+
+          arc((this.p2.pos.x + this.p1.pos.x) / 2, this.p1.pos.y + holeHeight/2, arcDiameter, arcDiameter, PI, TAU);
+        } else {
+
+          arc((this.p2.pos.x + this.p1.pos.x) / 2, this.p1.pos.y - holeHeight/2, arcDiameter, arcDiameter, 0, PI);
+        }
+      } else {
+        if (chooseRandom > 0.5) {
+          arc((this.p4.pos.x + this.p3.pos.x) / 2, this.p4.pos.y + holeHeight/2, arcDiameter, arcDiameter, PI, TAU);
+        } else {
+
+          arc((this.p4.pos.x + this.p3.pos.x) / 2, this.p4.pos.y - holeHeight/2, arcDiameter, arcDiameter, 0, PI);
+        }
+      }
+    }
   }
 }
 
-class Vertex {
-  constructor(x_, y_, angle_) {
-    this.x = x_;
-    this.y = y_;
-    this.angle = int(degrees(angle_));
+
+
+class squarePoint {
+  constructor(x, y) {
+    this.pos = createVector(x, y);
+    this.filled = false;
   }
 }

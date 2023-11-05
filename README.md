@@ -5,8 +5,7 @@ A place for studies and rough ideas.
 
 ## 2023
 
-<a href='2023/23012//'><img src='2023/23012//outputs/01.png' height='200' width='200' 
-style='margin: 5px;'></a>     <a href='2023/23011//'><img src='2023/23011//outputs/01.png' height='200' width='200' 
+<a href='2023/23011//'><img src='2023/23011//outputs/01.png' height='200' width='200' 
 style='margin: 5px;'></a>     <a href='2023/23010//'><img src='2023/23010//outputs/01.png' height='200' width='200' 
 style='margin: 5px;'></a>     <a href='2023/23009//'><img src='2023/23009//outputs/01.png' height='200' width='200' 
 style='margin: 5px;'></a>     <a href='2023/23008//'><img src='2023/23008//outputs/01.png' height='200' width='200' 

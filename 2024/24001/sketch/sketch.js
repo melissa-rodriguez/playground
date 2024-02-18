@@ -1,30 +1,61 @@
-let vehicle;
+let node;
 
 function setup() {
   createCanvas(1000, 1000);
-  vehicle = new Vehicle(100, 100);
+  node = new Node(width / 2, height / 2, 5);
 }
 
 function draw() {
   background(0);
 
-  // vehicle.wander();
-  let target = createVector(width/2, height/2);
-  fill(255, 0, 0);
-  noStroke();
-  ellipse(target.x, target.y, 32);
+  node.applyBehaviors();
+  node.show();
 
-  let wanderForce = vehicle.wander();
+}
 
-  if (vehicle.distance > 100) {
-    vehicle.applyForce(wanderForce.mult(5));
+class Node {
+  constructor(x, y, n) {
+    this.pos = createVector(x, y);
+    this.numberOfBranches = n;
+
+    this.vehicles = [];
+
+    for (let i = 0; i < this.numberOfBranches; i++) {
+      let vehicle = new Vehicle(this.pos.x, this.pos.y);
+      this.vehicles.push(vehicle);
+      this.target = createVector(random(width), random(height));
+    }
+
+
   }
 
-  let steering = vehicle.arrive(target);
-  vehicle.applyForce(steering);
+  applyBehaviors() {
+    fill(255, 0, 0);
+    noStroke();
+    ellipse(this.target.x, this.target.y, 32);
 
-  vehicle.update();
-  vehicle.show();
+    for (let i = 0; i < this.vehicles.length; i++) {
+      let vehicle = this.vehicles[i];
+      let wanderForce = vehicle.wander();
+
+      if (vehicle.distance > 100) {
+        vehicle.applyForce(wanderForce.mult(5));
+      }
+
+      let steering = vehicle.arrive(this.target);
+      vehicle.applyForce(steering);
+    }
+
+
+  }
+
+  show() {
+    for (let i = 0; i < this.vehicles.length; i++) {
+      let vehicle = this.vehicles[i];
+      vehicle.update();
+      vehicle.show();
+    }
+  }
 
 }
 
@@ -32,7 +63,7 @@ function draw() {
 class Vehicle {
   constructor(x, y) {
     this.pos = createVector(x, y);
-    this.vel = createVector(1, 0);
+    this.vel = p5.Vector.random2D();
     this.acc = createVector(0, 0);
     this.maxSpeed = 5;
     this.maxForce = 0.2;
@@ -91,31 +122,41 @@ class Vehicle {
     return force;
   }
 
-  wander() {
+  wander(debug = false) {
     let wanderPoint = this.vel.copy();
     wanderPoint.setMag(200);
     wanderPoint.add(this.pos);
-    fill(255, 0, 0);
-    noStroke();
-    circle(wanderPoint.x, wanderPoint.y, 8);
+
+    if (debug) {
+      fill(255, 0, 0);
+      noStroke();
+      circle(wanderPoint.x, wanderPoint.y, 8);
+    }
 
     let wanderRadius = 100;
-    noFill();
-    stroke(255);
-    circle(wanderPoint.x, wanderPoint.y, wanderRadius * 2);
-    line(this.pos.x, this.pos.y, wanderPoint.x, wanderPoint.y);
+
+    if (debug) {
+      noFill();
+      stroke(255);
+      circle(wanderPoint.x, wanderPoint.y, wanderRadius * 2);
+      line(this.pos.x, this.pos.y, wanderPoint.x, wanderPoint.y);
+    }
 
     let theta = this.wanderTheta + this.vel.heading();
 
     let x = wanderRadius * cos(theta);
     let y = wanderRadius * sin(theta);
     wanderPoint.add(x, y);
-    fill(0, 255, 0);
-    noStroke();
-    circle(wanderPoint.x, wanderPoint.y, 16);
 
-    stroke(255);
-    line(this.pos.x, this.pos.y, wanderPoint.x, wanderPoint.y);
+    if (debug) {
+      fill(0, 255, 0);
+      noStroke();
+      circle(wanderPoint.x, wanderPoint.y, 16);
+
+
+      stroke(255);
+      line(this.pos.x, this.pos.y, wanderPoint.x, wanderPoint.y);
+    }
 
     let steer = wanderPoint.sub(this.pos);
     steer.setMag(this.maxForce);
@@ -146,7 +187,6 @@ class Vehicle {
       this.currentPath.push(this.pos.copy());
     }
 
-    console.log(this.currentPath.length);
   }
 
   show() {

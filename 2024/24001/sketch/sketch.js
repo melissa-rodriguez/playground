@@ -46,6 +46,63 @@ function draw() {
     node.show();
   }
 
+  // Check for intersections if all vehicles have arrived at their targets
+  let allVehiclesArrived = nodes.every(node => node.allVehiclesArrived);
+  if (allVehiclesArrived) {
+    let intersectionPoints = []; // Store intersection points
+
+    // Loop through each node
+    for (let i = 0; i < nodes.length; i++) {
+      let node = nodes[i];
+
+      // Loop through each vehicle's path in the node
+      for (let j = 0; j < node.vehicles.length; j++) {
+        let vehicle = node.vehicles[j];
+
+        // Loop through other nodes to check intersections
+        for (let k = i + 1; k < nodes.length; k++) {
+          let otherNode = nodes[k];
+
+          // Loop through other node's vehicles' paths
+          for (let l = 0; l < otherNode.vehicles.length; l++) {
+            let otherVehicle = otherNode.vehicles[l];
+
+            // Check for intersection between current vehicle path and other vehicle path
+            for (let m = 0; m < vehicle.paths.length; m++) {
+              for (let n = 0; n < otherVehicle.paths.length; n++) {
+                let intersection = findIntersection(vehicle.paths[m], otherVehicle.paths[n]);
+                if (intersection !== null) {
+                  // Check if intersection is within 25 pixels of another stored intersection point
+                  let tooClose = false;
+                  for (let p = 0; p < intersectionPoints.length; p++) {
+                    let distSq = (intersection.x - intersectionPoints[p].x) ** 2 + (intersection.y - intersectionPoints[p].y) ** 2;
+                    if (distSq < 25 ** 2) {
+                      tooClose = true;
+                      break;
+                    }
+                  }
+                  if (!tooClose) {
+                    intersectionPoints.push(intersection);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    push();
+    // Display intersection points
+    fill(255, 0, 0);
+    stroke(255); 
+    for (let i = 0; i < intersectionPoints.length; i++) {
+      ellipse(intersectionPoints[i].x, intersectionPoints[i].y, 10);
+    }
+    pop();
+  }
+
+
   push();
   noFill();
   stroke(255);
@@ -283,7 +340,7 @@ class Vehicle {
   }
 
   edges() {
-    let avoidanceRadius = 400; // Distance at which vehicles start avoiding the edges
+    let avoidanceRadius = 200; // Distance at which vehicles start avoiding the edges
     let desired = null;
 
     // Check if the vehicle is within the avoidance radius of any edge
@@ -309,6 +366,18 @@ class Vehicle {
     }
 
   }
+}
+
+function findIntersection(path1, path2) {
+  for (let i = 0; i < path1.length - 1; i++) {
+    for (let j = 0; j < path2.length - 1; j++) {
+      let intersection = intersect(path1[i].x, path1[i].y, path1[i + 1].x, path1[i + 1].y, path2[j].x, path2[j].y, path2[j + 1].x, path2[j + 1].y);
+      if (intersection.intersects) {
+        return createVector(intersection.x, intersection.y);
+      }
+    }
+  }
+  return null;
 }
 
 

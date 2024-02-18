@@ -1,12 +1,38 @@
+let padding = 0.1;
+let upper_Left, lower_Left, upper_Right, lower_Right;
 let nodes = [];
+
 
 function setup() {
   createCanvas(1000, 1000);
 
+  let rightEdge = (width - width * padding);
+  let leftEdge = (width * padding);
+  let bottomEdge = (height - height * padding);
+  let topEdge = (height * padding);
+
+  upper_Left = createVector(leftEdge, topEdge);
+  lower_Left = createVector(leftEdge, bottomEdge);
+  upper_Right = createVector(rightEdge, topEdge);
+  lower_Right = createVector(rightEdge, bottomEdge);
+
+  let corners = [upper_Left, lower_Left, upper_Right, lower_Right];
+
   let cols = ['blue', 'green', 'yellow']
   for (let i = 0; i < 3; i++) {
     let strokeCol = cols[i];
-    node = new Node(random(width), random(height), int(random(2, 5)), strokeCol);
+    let startPt = corners[int(random(corners.length))];
+
+     // Choose a target that is not the same as the startPt
+     let targetIndex = int(random(corners.length - 1));
+     if (corners[targetIndex].equals(startPt)) {
+       targetIndex = (targetIndex + 1) % corners.length;
+     }
+     let target = corners[targetIndex];
+     
+    let numBranches = int(random(1, 3));
+
+    node = new Node(startPt, target, numBranches, strokeCol);
     nodes.push(node);
   }
 }
@@ -20,21 +46,28 @@ function draw() {
     node.show();
   }
 
+  push();
+  noFill();
+  stroke(255);
+  rectMode(CORNERS);
+  rect(upper_Left.x, upper_Left.y, lower_Right.x, lower_Right.y);
+  pop();
+
 }
 
 class Node {
-  constructor(x, y, n, col) {
-    this.pos = createVector(x, y);
+  constructor(origin, target_, n, col) {
+    this.pos = origin;
     this.numberOfBranches = n;
-    this.strokeCol = col; 
+    this.strokeCol = col;
 
     this.vehicles = [];
 
     for (let i = 0; i < this.numberOfBranches; i++) {
-      let wobblyFactor = int(random(0, 20));
+      let wobblyFactor = int(random(0, 5));
       let vehicle = new Vehicle(this.pos.x, this.pos.y, wobblyFactor);
       this.vehicles.push(vehicle);
-      this.target = createVector(random(width), random(height));
+      this.target = target_;
     }
 
     this.allVehiclesArrived = false;
@@ -65,11 +98,13 @@ class Node {
 
   show() {
     stroke(this.strokeCol);
+    strokeWeight(4);
     let allArrived = true; // Assume all vehicles have arrived initially
     for (let i = 0; i < this.vehicles.length; i++) {
       let vehicle = this.vehicles[i];
       vehicle.update();
       vehicle.show();
+      vehicle.edges();
 
       // Check if the current vehicle has not arrived
       if (!vehicle.hasArrived) {
@@ -227,7 +262,6 @@ class Vehicle {
 
   show(debug = false) {
     // stroke(255);
-    strokeWeight(2);
 
     if (debug) {
       fill(255);
@@ -249,26 +283,31 @@ class Vehicle {
   }
 
   edges() {
-    let hitEdge = false;
-    if (this.pos.x > width + this.r) {
-      this.pos.x = -this.r;
-      hitEdge = true;
-    } else if (this.pos.x < -this.r) {
-      this.pos.x = width + this.r;
-      hitEdge = true;
-    }
-    if (this.pos.y > height + this.r) {
-      this.pos.y = -this.r;
-      hitEdge = true;
-    } else if (this.pos.y < -this.r) {
-      this.pos.y = height + this.r;
-      hitEdge = true;
+    let avoidanceRadius = 400; // Distance at which vehicles start avoiding the edges
+    let desired = null;
+
+    // Check if the vehicle is within the avoidance radius of any edge
+    if (this.pos.x < avoidanceRadius) {
+      desired = createVector(this.maxSpeed, this.vel.y); // Move right
+    } else if (this.pos.x > width - avoidanceRadius) {
+      desired = createVector(-this.maxSpeed, this.vel.y); // Move left
     }
 
-    if (hitEdge) {
-      this.currentPath = [];
-      this.paths.push(this.currentPath);
+    if (this.pos.y < avoidanceRadius) {
+      desired = createVector(this.vel.x, this.maxSpeed); // Move down
+    } else if (this.pos.y > height - avoidanceRadius) {
+      desired = createVector(this.vel.x, -this.maxSpeed); // Move up
     }
+
+    // If desired velocity is set, steer towards it to avoid the edge
+    if (desired !== null) {
+      desired.normalize();
+      desired.mult(this.maxSpeed);
+      let steer = p5.Vector.sub(desired, this.vel);
+      steer.limit(this.maxForce);
+      this.applyForce(steer);
+    }
+
   }
 }
 

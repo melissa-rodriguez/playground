@@ -1,10 +1,12 @@
-let padding = 0.1;
+let padding = 0.25;
 let upper_Left, lower_Left, upper_Right, lower_Right;
 let nodes = [];
-
+let newNodeCounter = 0; 
+let cols = ['blue', 'green', 'red'];
 
 function setup() {
   createCanvas(1000, 1000);
+  colorMode(HSB, 255); 
 
   let rightEdge = (width - width * padding);
   let leftEdge = (width * padding);
@@ -18,9 +20,10 @@ function setup() {
 
   let corners = [upper_Left, lower_Left, upper_Right, lower_Right];
 
-  let cols = ['blue', 'green', 'yellow']
+  
   for (let i = 0; i < 3; i++) {
     let strokeCol = cols[i];
+    strokeCol = 220 - 60*newNodeCounter;
     let startPt = corners[int(random(corners.length))];
 
      // Choose a target that is not the same as the startPt
@@ -30,7 +33,7 @@ function setup() {
      }
      let target = corners[targetIndex];
      
-    let numBranches = int(random(1, 3));
+    let numBranches = int(random(1, 4));
 
     node = new Node(startPt, target, numBranches, strokeCol);
     nodes.push(node);
@@ -38,7 +41,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background(240);
 
   for (let i = 0; i < nodes.length; i++) {
     let node = nodes[i];
@@ -46,66 +49,78 @@ function draw() {
     node.show();
   }
 
-  // Check for intersections if all vehicles have arrived at their targets
-  let allVehiclesArrived = nodes.every(node => node.allVehiclesArrived);
-  if (allVehiclesArrived) {
-    let intersectionPoints = []; // Store intersection points
+ // Check for intersections if all vehicles have arrived at their targets
+ let allVehiclesArrived = nodes.every(node => node.allVehiclesArrived);
+ if (allVehiclesArrived && newNodeCounter < 2) {
+   let intersectionPoints = []; // Store intersection points
+    newNodeCounter++; 
+    console.log(newNodeCounter);
+   // Loop through each node
+   for (let i = 0; i < nodes.length; i++) {
+     let node = nodes[i];
 
-    // Loop through each node
-    for (let i = 0; i < nodes.length; i++) {
-      let node = nodes[i];
+     // Loop through each vehicle's path in the node
+     for (let j = 0; j < node.vehicles.length; j++) {
+       let vehicle = node.vehicles[j];
 
-      // Loop through each vehicle's path in the node
-      for (let j = 0; j < node.vehicles.length; j++) {
-        let vehicle = node.vehicles[j];
+       // Loop through other nodes to check intersections
+       for (let k = i + 1; k < nodes.length; k++) {
+         let otherNode = nodes[k];
 
-        // Loop through other nodes to check intersections
-        for (let k = i + 1; k < nodes.length; k++) {
-          let otherNode = nodes[k];
+         // Loop through other node's vehicles' paths
+         for (let l = 0; l < otherNode.vehicles.length; l++) {
+           let otherVehicle = otherNode.vehicles[l];
 
-          // Loop through other node's vehicles' paths
-          for (let l = 0; l < otherNode.vehicles.length; l++) {
-            let otherVehicle = otherNode.vehicles[l];
+           // Check for intersection between current vehicle path and other vehicle path
+           for (let m = 0; m < vehicle.paths.length; m++) {
+             for (let n = 0; n < otherVehicle.paths.length; n++) {
+               let intersection = findIntersection(vehicle.paths[m], otherVehicle.paths[n]);
+               if (intersection !== null) {
+                 // Check if intersection is within 25 pixels of another stored intersection point
+                 let tooClose = false;
+                 for (let p = 0; p < intersectionPoints.length; p++) {
+                   let distSq = (intersection.x - intersectionPoints[p].x) ** 2 + (intersection.y - intersectionPoints[p].y) ** 2;
+                   if (distSq < 25 ** 2) {
+                     tooClose = true;
+                     break;
+                   }
+                 }
+                 if (!tooClose) {
+                   intersectionPoints.push(intersection);
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+   }
 
-            // Check for intersection between current vehicle path and other vehicle path
-            for (let m = 0; m < vehicle.paths.length; m++) {
-              for (let n = 0; n < otherVehicle.paths.length; n++) {
-                let intersection = findIntersection(vehicle.paths[m], otherVehicle.paths[n]);
-                if (intersection !== null) {
-                  // Check if intersection is within 25 pixels of another stored intersection point
-                  let tooClose = false;
-                  for (let p = 0; p < intersectionPoints.length; p++) {
-                    let distSq = (intersection.x - intersectionPoints[p].x) ** 2 + (intersection.y - intersectionPoints[p].y) ** 2;
-                    if (distSq < 25 ** 2) {
-                      tooClose = true;
-                      break;
-                    }
-                  }
-                  if (!tooClose) {
-                    intersectionPoints.push(intersection);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+   // Randomly create new nodes from intersection points with a 30% chance
+   for (let i = 0; i < intersectionPoints.length; i++) {
+     if (random(1) < 0.3) {
+       let intersection = intersectionPoints[i];
+       let startPt = intersection.copy();
+       let targetIndex = int(random(4));
+       let target = [upper_Left, lower_Left, upper_Right, lower_Right][targetIndex];
+       let numBranches = int(random(1, 4));
+       let strokeCol = cols[int(random(cols.length))];
+       strokeCol = 220 - 60*newNodeCounter; 
+       let newNode = new Node(startPt, target, numBranches, strokeCol);
+       nodes.push(newNode);
+     }
+   }
 
-    push();
-    // Display intersection points
-    fill(255, 0, 0);
-    stroke(255); 
-    for (let i = 0; i < intersectionPoints.length; i++) {
-      ellipse(intersectionPoints[i].x, intersectionPoints[i].y, 10);
-    }
-    pop();
-  }
+   // Reset intersection points array
+   intersectionPoints = [];
+ }
+
 
 
   push();
   noFill();
-  stroke(255);
+  stroke(0);
+  strokeWeight(1);
   rectMode(CORNERS);
   rect(upper_Left.x, upper_Left.y, lower_Right.x, lower_Right.y);
   pop();
@@ -133,9 +148,9 @@ class Node {
   }
 
   applyBehaviors() {
-    fill(255, 0, 0);
-    noStroke();
-    ellipse(this.target.x, this.target.y, 32);
+    // fill(255, 0, 0);
+    // noStroke();
+    // ellipse(this.target.x, this.target.y, 32);
 
     for (let i = 0; i < this.vehicles.length; i++) {
       let vehicle = this.vehicles[i];
@@ -154,7 +169,9 @@ class Node {
   }
 
   show() {
+    
     stroke(this.strokeCol);
+    // stroke(0);
     strokeWeight(4);
     let allArrived = true; // Assume all vehicles have arrived initially
     for (let i = 0; i < this.vehicles.length; i++) {
@@ -171,7 +188,6 @@ class Node {
 
     // Set allVehiclesArrived to true only if all vehicles have arrived
     this.allVehiclesArrived = allArrived;
-
     // if (this.allVehiclesArrived) {
     //   ellipse(width / 2, height / 2, 200);
     // }
@@ -364,7 +380,6 @@ class Vehicle {
       steer.limit(this.maxForce);
       this.applyForce(steer);
     }
-
   }
 }
 

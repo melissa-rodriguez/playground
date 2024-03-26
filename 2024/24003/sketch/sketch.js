@@ -7,38 +7,35 @@ function draw() {
   background(240);
   fill('red');
   noStroke();
-  ellipse(width / 2, height / 2, 400);
+  // ellipse(width / 2, height / 2, 400);
+  rect(width / 2, height / 2, 400);
 
-  let noiseScale = .001; // Adjust this value to control the intensity of the distortion
-  let maxDisplacement = 80; // How close is the displaced pixel to the original image
-  let stripWidth = 10; // Width of strips
-
-  glass_rasterize_strips(stripWidth, noiseScale, maxDisplacement);
+  let noiseScale = 0.07; // Adjust this value to control the intensity of the distortion
+  let maxDisplacement = 100;
+  glass_rasterize(noiseScale, maxDisplacement); 
 
   noLoop();
 }
 
-function glass_rasterize_strips(stripWidth, noiseScale, maxDisplacement) {
+function glass_rasterize(noiseScale, maxDisplacement) {
   loadPixels();
 
-  // Use a separate noise variable for consistent displacement across the canvas
-  let noiseY = 0;
-
   for (let y = 0; y < height; y++) {
-    noiseY += noiseScale; // Increment noiseY to generate a new noise value for each row
-
     for (let x = 0; x < width; x++) {
       let index = (x + y * width) * 4;
 
-      // Calculate displacement amount based on noise map
-      let noiseVal = noise(noiseY) * maxDisplacement;
+      // Get displacement amount from noise map
+      let noiseVal = noise(x * noiseScale, y * noiseScale) * maxDisplacement; // 50 is the maximum displacement amount
+
+      // Apply displacement to x-coordinate
+      let displacedX = floor(x + noiseVal);
+      displacedX = constrain(displacedX, 0, width - 1);
+      // Apply displacement to x-coordinate
+      let displacedY = floor(y + noiseVal);
+      displacedY = constrain(displacedY, 0, width - 1);
 
       // Map pixels from original image to canvas with displacement
-      let displacedX = floor(x + map(x % stripWidth, 0, stripWidth, -noiseVal, noiseVal));
-      displacedX = constrain(displacedX, 0, width - 1);
-
-      let displacedIndex = (displacedX + y * width) * 4;
-
+      let displacedIndex = (displacedX + displacedY * width) * 4;
       pixels[index] = pixels[displacedIndex]; // Red
       pixels[index + 1] = pixels[displacedIndex + 1]; // Green
       pixels[index + 2] = pixels[displacedIndex + 2]; // Blue

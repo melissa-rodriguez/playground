@@ -13,15 +13,15 @@ function draw() {
   let col = color(0, 0, 255, 15);
   // let col = color(242, 92, 5, 40);
   noStroke();
-  let radius = 400; 
+  let radius =300; 
 
   fill(red(col), green(col), blue(col), 7);
   // ellipse(width / 2, height / 2, radius, radius + 300);
 
 
   let noiseMax = .5;
-  let rMax =radius - 100;
-  let rMin = -70;
+  let rMax =radius;
+  let rMin = -rMax/4;
   let amt = 100;
   for (let i = 0; i < amt; i++) {
     beginShape();

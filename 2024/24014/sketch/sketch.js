@@ -11,6 +11,7 @@ function draw() {
   // fill(0);
   // ellipse(width / 2, height / 2, 200);
   
+  strokeWeight(5)
   shape.show(); 
 }
 

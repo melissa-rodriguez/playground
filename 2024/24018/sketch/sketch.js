@@ -1,4 +1,3 @@
-
 function setup() {
   createCanvas(1000, 1000);
 }
@@ -14,15 +13,18 @@ function draw() {
   //rotate about corner
   let rotateAngle = 0;
 
+  let numArcs = 4; 
+
   stroke(0);
   fill(0);
   strokeWeight(4);
-  cutArc1(x, y, w, h, rotateAngle);
+  cutArc(x, y, w, h, rotateAngle, numArcs);
+
 
 
 }
 
-function cutArc1(x, y, w, h, rotateAngle) {
+function cutArc(x, y, w, h, rotateAngle, numArcs) {
   push();
   translate(x, y);
   rotate(rotateAngle);
@@ -35,7 +37,31 @@ function cutArc1(x, y, w, h, rotateAngle) {
   line1.show();
   arc1.show();
   endShape(CLOSE);
+
+  if (numArcs > 1) {
+    beginShape();
+    rotate(PI + PI / 2);
+    line1.show();
+    arc1.show();
+    endShape();
+  }
+
+  if (numArcs > 2) {
+    beginShape();
+    rotate(PI);
+    line1.show();
+    arc1.show();
+    endShape();
+
+    beginShape();
+    rotate(PI/2);
+    line1.show();
+    arc1.show();
+    endShape();
+  }
+
   pop();
+
 }
 
 class LerpArc {

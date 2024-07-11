@@ -212,10 +212,10 @@ function setup() {
   createCanvas(1000, 1000);
   background(0);
   noFill();
-  stroke(240);
+  stroke(200);
   strokeWeight(3);
 
-  let wordLength = 2;
+  let wordLength = 3;
   for (let i = 0; i < wordLength; i++) {
     let size = 300;
     let x = (size) + size * i;
@@ -269,24 +269,27 @@ function setup() {
 
 function draw() {
   background(240);
+  // Draw the overall outline
+  drawOverallOutline();
 
   fill(240);
   stroke(0);
-  strokeWeight(5);
+  strokeWeight(10);
   for (let i = 0; i < outlineShapes.length; i++) {
     let wordShape = outlineShapes[i];
     wordShape.draw();
   }
 
-  // Draw the overall outline
-  drawOverallOutline();
+
 }
 
 function drawOverallOutline() {
   push();
   noFill();
+  fill(0);
   stroke(255, 0, 0);
-  strokeWeight(2);
+  noStroke();
+  strokeWeight(10);
   beginShape();
   for (let i = 0; i < allOutlinePoints.length; i++) {
     curveVertex(allOutlinePoints[i].x, allOutlinePoints[i].y);

@@ -3,7 +3,8 @@ A place for studies and rough ideas.
 # previews  
 
 ## 2025
-- - - hiatus - - -
+
+<p align="center">— hiatus —</p>
 
 ## 2024
 

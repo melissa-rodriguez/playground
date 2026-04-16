@@ -2,6 +2,8 @@
 A place for studies and rough ideas.  
 # previews  
 
+## 2025
+- - - hiatus - - -
 
 ## 2024
 

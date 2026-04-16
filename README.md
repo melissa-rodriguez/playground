@@ -1,5 +1,5 @@
 # playground
-A place for studies and rough ideas.  
+a place for studies and rough ideas.  
 # previews  
 
 ## 2025

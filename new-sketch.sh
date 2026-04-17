@@ -7,15 +7,12 @@
 # via an alias in ~/.zshrc. if you need to set it up again on a new machine:
 #
 #   1. add this line to ~/.zshrc:
-#      alias new-sketch='/Users/melissarodriguez/Documents/creative_coding/playground/new-sketch.sh'
+#      alias new-sketch='/path/to/playground/new-sketch.sh'
 #   2. run: source ~/.zshrc
 #   3. you can now run `new-sketch` from anywhere
-#
-# note: `cd` into the sketch folder won't work from a .sh file (it runs in
-# a subshell). vs code will open the sketch folder automatically instead.
 # ─────────────────────────────────────────────────────────────────────────────
 
-PLAYGROUND_DIR="/Users/melissarodriguez/Documents/creative-coding/playground"
+PLAYGROUND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EMPTY_EXAMPLE="$PLAYGROUND_DIR/empty-example"
 README="$PLAYGROUND_DIR/README.md"
 
@@ -71,15 +68,14 @@ else
   ' "$README" > "$README.tmp" && mv "$README.tmp" "$README"
 fi
 
-# ── commit to playground repo ─────────────────────────────────────────────────
+# ── commit and push to playground repo ───────────────────────────────────────
 cd "$PLAYGROUND_DIR"
 git add .
 git commit -m "new sketch $SKETCH_NAME"
 echo "✅ committed to playground repo"
 
-# ── push to remote ────────────────────────────────────────────────────────────
-  git push
-  echo "🚀 pushed to remote"
+git push
+echo "🚀 pushed to remote"
 
 # ── branch prompt ─────────────────────────────────────────────────────────────
 echo ""

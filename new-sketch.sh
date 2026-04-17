@@ -77,6 +77,10 @@ git add .
 git commit -m "new sketch $SKETCH_NAME"
 echo "✅ committed to playground repo"
 
+# ── push to remote ────────────────────────────────────────────────────────────
+  git push
+  echo "🚀 pushed to remote"
+
 # ── branch prompt ─────────────────────────────────────────────────────────────
 echo ""
 echo "💡 want to start on a branch? type a description or hit enter to stay on main."

@@ -15,7 +15,7 @@
 # a subshell). vs code will open the sketch folder automatically instead.
 # ─────────────────────────────────────────────────────────────────────────────
 
-PLAYGROUND_DIR="/Users/melissarodriguez/Documents/creative_coding/playground"
+PLAYGROUND_DIR="/Users/melissarodriguez/Documents/creative-coding/playground"
 EMPTY_EXAMPLE="$PLAYGROUND_DIR/empty-example"
 README="$PLAYGROUND_DIR/README.md"
 

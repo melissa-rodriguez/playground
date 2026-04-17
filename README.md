@@ -2,6 +2,15 @@
 a place for studies and rough ideas.  
 # previews  
 
+## 2026
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+<a href='2026/26001//'><img src='2026/26001//outputs/01.png' height='200' style='margin: 5px;'></a>
+
 ## 2025
 
 <p align="center">— hiatus —</p>
